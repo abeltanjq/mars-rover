@@ -22,6 +22,12 @@ public class RoverController {
         this.roverService = roverService;
     }
 
+    /**
+     * @param create Creates a new Rover. eg. 0,0,N -> format: x pos, y pos, direction.
+     * @return Newly created Rover's info.
+     *
+     * Returns 400 if there is already a rover at that position.
+     */
     @PostMapping("/rovers")
     public ResponseEntity<Rover> createRover(@RequestParam String create) {
         Rover r = RoverFactory.create(create);
@@ -29,16 +35,30 @@ public class RoverController {
         return new ResponseEntity<>(r, HttpStatus.CREATED);
     }
 
+    /**
+     * @param id A Rover's id. Eg. R1
+     * @return Rover's info
+     */
     @GetMapping("/rovers/{id}")
     public ResponseEntity<Rover> currentPosition(@PathVariable String id) {
         return ResponseEntity.of(Optional.ofNullable(roverService.find(id)));
     }
 
+    /**
+     * @return A list of Rovers and its positions
+     */
     @GetMapping("/rovers")
     public List<Rover> getRovers() {
         return roverService.findAll();
     }
 
+    /**
+     * @param id Rover's id. Eg. R1
+     * @param command Command to move a Rover separated by a comma. "f": forward, "b": back, "r": turn right, "l": turn left
+     * @return Final position of the rover
+     *
+     * Should the movement intersect with another rover, it will stop at its tracks and stop future commands.
+     */
     @PutMapping("/rovers/{id}")
     public Rover moveRover(@PathVariable String id, @RequestParam String command) {
         return roverService.move(id, command);
